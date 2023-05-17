@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Music Albums Search</title>
+  </head>
+  <body>
+  <h1>Music Albums from {{artist}}</h1>
+  <table>
+    <tr style="text-align:left;">
+      <th>Album Name</th>
+      <th>Year Released</th>
+      <th>Genre</th>
+    </tr>
+    {% for album in albums | sort(attribute='intYearReleased') %}
+
+    <tr>
+      <td>{{ album.strAlbum }}</td>
+      <td> {{ album.intYearReleased}}</td>
+      <td>{{ album.strGenre }}</td>
+
+    </tr>
+
+    {% endfor %}
+  </table>
+
+  </body>
+</html>
