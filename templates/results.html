@@ -5,17 +5,35 @@
   </head>
   <body>
   <h1>Music Albums from {{artist}}</h1>
+
+  <table>
+    <tr>
+      <td>
+        <form method="POST" action="{{ url_for('update', artist=artist) }}">
+          {% if data.is_active %}
+          <button type="submit" name="isActive" value="True">Sort by Year</button>
+          {% else %}
+          <button type="submit" name="isActive" value="False">Sort by Year</button>
+          {% endif %}
+        </form>
+      </td>
+
+      <td><a href="/">Search for another artist</a></td>
+    </tr>
+  </table>
+
+
   <table>
     <tr style="text-align:left;">
       <th>Album Name</th>
       <th>Year Released</th>
       <th>Genre</th>
     </tr>
-    {% for album in albums | sort(attribute='intYearReleased') %}
+    {% for album in albums %}
 
     <tr>
       <td>{{ album.strAlbum }}</td>
-      <td> {{ album.intYearReleased}}</td>
+      <td>{{ album.intYearReleased}}</td>
       <td>{{ album.strGenre }}</td>
 
     </tr>

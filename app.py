@@ -1,18 +1,35 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 import requests
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = 'secret key'
+
+data = {
+    'isActive': False
+}
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+
     if request.method == 'POST':
         artist_name = request.form['artist']
         albums = search_albums(artist_name)
+
+        if albums is None:
+            error = 'No albums found for this artist'
+            return render_template('index.html', error=error, data=data)
+
+
+        if data['isActive']:
+            albums.sort(key=lambda x: x['intYearReleased'], reverse=True)
+        else:
+            albums.sort(key=lambda x: x['intYearReleased'])
+
         save_albums_to_db(artist_name, albums)
-        return render_template('results.html', artist=artist_name, albums=albums)
-    return render_template('index.html')
+        return render_template('results.html', artist=artist_name, albums=albums, data=data)
+    return render_template('index.html', data=data)
 
 
 def search_albums(artist_name):
@@ -35,6 +52,24 @@ def save_albums_to_db(artist_name, albums):
     conn.commit()
     conn.close()
 
+@app.route('/update', methods=['GET', 'POST'])
+def update():
+    if request.method == 'POST':
+        data['isActive'] = not data['isActive']
+        artist_name = request.args.get('artist')
+        albums = search_albums(artist_name)
+
+
+        if data['isActive']:
+            albums.sort(key=lambda x: x['intYearReleased'], reverse=True)
+        else:
+            albums.sort(key=lambda x: x['intYearReleased'])
+
+        save_albums_to_db(artist_name, albums)
+        return render_template('results.html', artist=artist_name, albums=albums, data=data)
+
+
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
